@@ -50,3 +50,10 @@ button:hover {
     text-decoration: line-through;
 }
 
+.unchecked-only-toggle {
+    margin-top: 15px;
+}
+
+form > input {
+    margin-top: 15px;
+}
