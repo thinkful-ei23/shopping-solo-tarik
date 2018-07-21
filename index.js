@@ -10,6 +10,7 @@ const STORE = {
     {name: 'bread', checked: false}
   ],
   checkboxToggled: false,
+  currentSearch: '',
 };
 
 function generateItemElement(item, itemIndex, template) {
@@ -43,9 +44,13 @@ function renderShoppingList() {
   //Const variable representing current itemlist (copy of STORE.items)
   let currentList = [...STORE.items];
 
-  if (STORE.checkboxToggled === true) {
+  if (STORE.checkboxToggled) {
     currentList = currentList.filter(function(listItem) {
-      listItem.checked === false;
+      return !listItem.checked;
+    });
+  } else if (STORE.currentSearch !== '') {
+    currentList = currentList.filter(function(listItem) {
+      return listItem.name.indexOf(STORE.currentSearch) === 0;
     });
   }
   const shoppingListItemsString = generateShoppingItemsString(currentList);
@@ -116,10 +121,23 @@ function changeCheckboxToggledState() {
   STORE.checkboxToggled = !STORE.checkboxToggled;
 }
 
-function handleClickedCheckbox () {
+function handleClickedCheckbox() {
   $('.js-unchecked-only-toggle').on('click', function(event){
     console.log('handleClickedCheckbox ran');
     changeCheckboxToggledState();
+    renderShoppingList();
+  });
+}
+
+function addToCurrentSearch(ascii) {
+  STORE.currentSearch += String.fromCharCode(ascii);
+}
+
+function handleShoppingListSearch() {
+  $('.js-shopping-list-search').on('keypress', function(event) {
+    console.log('handleShoppingListSearch ran');
+    const keyAscii = event.which;
+    addToCurrentSearch(keyAscii);
     renderShoppingList();
   });
 }
@@ -134,7 +152,7 @@ function handleShoppingList() {
   handleItemCheckedClicked();
   handleDeleteItemClicked();
   handleClickedCheckbox();
-
+  handleShoppingListSearch();
 }
 
 // when the page loads, call `handleShoppingList`
