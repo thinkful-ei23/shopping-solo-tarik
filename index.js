@@ -129,16 +129,33 @@ function handleClickedCheckbox() {
   });
 }
 
+function deleteFromCurrentSearch() {
+  console.log('deleteFromCurrentSearch ran!');
+  STORE.currentSearch = STORE.currentSearch.slice(0, (STORE.currentSearch.length-1));
+  console.log(STORE.currentSearch);
+}
+
 function addToCurrentSearch(ascii) {
   STORE.currentSearch += String.fromCharCode(ascii);
 }
 
-function handleShoppingListSearch() {
+function handleAddToShoppingListSearch() {
   $('.js-shopping-list-search').on('keypress', function(event) {
     console.log('handleShoppingListSearch ran');
     const keyAscii = event.which;
+    console.log(keyAscii);
     addToCurrentSearch(keyAscii);
     renderShoppingList();
+  });
+}
+
+function handleDeleteFromShoppingListSearch() {
+  $('.js-shopping-list-search').on('keydown', function(event) {
+    const keyAscii = event.which;
+    if (keyAscii === 8) {
+      deleteFromCurrentSearch();
+      renderShoppingList();
+    }
   });
 }
 
@@ -152,7 +169,8 @@ function handleShoppingList() {
   handleItemCheckedClicked();
   handleDeleteItemClicked();
   handleClickedCheckbox();
-  handleShoppingListSearch();
+  handleAddToShoppingListSearch();
+  handleDeleteFromShoppingListSearch();
 }
 
 // when the page loads, call `handleShoppingList`
