@@ -158,6 +158,15 @@ function handleDeleteFromShoppingListSearch() {
     }
   });
 }
+/*function refreshShoppingList() {
+  STORE.currentSearch = '';
+}
+function handleClearSearchResults() {
+  $('js-clear-search').on('click', function(event) {
+    event.preventDefault();
+    refreshShoppingList();
+  });
+}*/
 
 // this function will be our callback when the page loads. it's responsible for
 // initially rendering the shopping list, and activating our individual functions
