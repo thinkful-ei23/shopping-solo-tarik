@@ -4,10 +4,10 @@
 
 const STORE = {
   items: [
-    {name: 'apples', checked: false}, 
-    {name: 'oranges', checked: false},
-    {name: 'milk', checked: true},
-    {name: 'bread', checked: false}
+    {name: 'apples', checked: false, editMode: false}, 
+    {name: 'oranges', checked: false, editMode: false},
+    {name: 'milk', checked: true, editMode: false},
+    {name: 'bread', checked: false, editMode: false}
   ],
   checkboxToggled: false,
   currentSearch: '',
@@ -21,6 +21,9 @@ function generateItemElement(item, itemIndex, template) {
       <button class="shopping-item-toggle js-item-toggle">
         <span class="button-label">check</span>
       </button>
+      <button class="shopping-item-edit js-item-edit">
+        <span class="button-label">Edit</span>
+      </button>
       <button class="shopping-item-delete js-item-delete">
         <span class="button-label">delete</span>
       </button>
@@ -28,11 +31,33 @@ function generateItemElement(item, itemIndex, template) {
   </li>`;
 }
 
+function generateElementInEditMode(item, itemIndex, template) {
+  return `
+  <li class="js-item-index-element" data-item-index="${itemIndex}">
+    <div class="edit-item-name-controls"> 
+      <form id="js-edit-item-form"> 
+        <input type="text" name ="shopping-item-name" class="name-edit-val js-name-edit-val" placeholder="${item.name}">
+        <button type="submit" class="item-name-confirm js-item-name-confirm">
+          <span class="button-label">confirm</span>
+        </button>
+        <button class="edit-item-cancel js-edit-item-cancel">
+          <span class="button-label">cancel</span>
+        </button>
+      </form>
+    </div>
+  </li>`;
+}
+
 function generateShoppingItemsString(shoppingList) {
   console.log('Generating shopping list element');
 
-  const items = shoppingList.map((item, index) => generateItemElement(item, index));
-
+  const items = shoppingList.map((item, index) => {
+    if (item.editMode) {
+      return generateElementInEditMode(item, index);
+    } else {
+      return generateItemElement(item, index);
+    }
+  });
   return items.join('');
 }
 
@@ -158,6 +183,49 @@ function handleDeleteFromShoppingListSearch() {
     }
   });
 }
+
+
+function toggleEditModeForListItem(itemIndex) {
+  console.log(`Toggling editMode property for item at index ${itemIndex}`);
+  STORE.items[itemIndex].editMode = !STORE.items[itemIndex].editMode;
+}
+
+function handleEditItemClicked() {
+  $('.js-shopping-list').on('click', '.js-item-edit', event => {
+    console.log('handleEditItemClicked ran');
+    event.preventDefault();
+    const itemIndex = getItemIndexFromElement(event.currentTarget);
+    toggleEditModeForListItem (itemIndex);
+    renderShoppingList();
+  });
+}
+
+function handleCancelEditItem() {
+  $('.js-shopping-list').on('click', '.js-edit-item-cancel', event => {
+    console.log('handleCancelEditItem ran!');
+    event.preventDefault();
+    const itemIndex = getItemIndexFromElement(event.currentTarget);
+    toggleEditModeForListItem(itemIndex);
+    renderShoppingList();
+  });
+}
+
+function addNameChange(newName, itemIndex) {
+  console.log('addNameChange ran');
+  STORE.items[itemIndex].name = newName;
+}
+
+function handleSubmitEditItem() {
+  $('.js-shopping-list').on('submit', '#js-edit-item-form', event => {
+    console.log('handleSubmitEditItem ran!');
+    event.preventDefault();
+    const newName = $('.js-name-edit-val').val();
+    const itemIndex = getItemIndexFromElement(event.currentTarget);
+    addNameChange(newName, itemIndex);
+    toggleEditModeForListItem(itemIndex);
+    renderShoppingList();
+  });
+}
 /*function refreshShoppingList() {
   STORE.currentSearch = '';
 }
@@ -165,6 +233,7 @@ function handleClearSearchResults() {
   $('js-clear-search').on('click', function(event) {
     event.preventDefault();
     refreshShoppingList();
+    renderShoppingList();
   });
 }*/
 
@@ -172,6 +241,7 @@ function handleClearSearchResults() {
 // initially rendering the shopping list, and activating our individual functions
 // that handle new item submission and user clicks on the "check" and "delete" buttons
 // for individual shopping list items.
+
 function handleShoppingList() {
   renderShoppingList();
   handleNewItemSubmit();
@@ -180,6 +250,9 @@ function handleShoppingList() {
   handleClickedCheckbox();
   handleAddToShoppingListSearch();
   handleDeleteFromShoppingListSearch();
+  handleEditItemClicked ();
+  handleCancelEditItem();
+  handleSubmitEditItem();
 }
 
 // when the page loads, call `handleShoppingList`
