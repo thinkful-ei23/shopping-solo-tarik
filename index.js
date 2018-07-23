@@ -75,7 +75,7 @@ function renderShoppingList() {
     });
   } else if (STORE.currentSearch !== '') {
     currentList = currentList.filter(function(listItem) {
-      return listItem.name.indexOf(STORE.currentSearch) === 0;
+      return listItem.name.indexOf(STORE.currentSearch) !== -1;
     });
   }
   const shoppingListItemsString = generateShoppingItemsString(currentList);
